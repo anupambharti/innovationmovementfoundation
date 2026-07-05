@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Innovation Movement Foundation — App Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --kraft-light:#D9C4A0;
+    --kraft:#B99968;
+    --cardboard:#7A5C3E;
+    --chalk:#26332A;
+    --chalk-deep:#1B241D;
+    --paper:#F6F0E4;
+    --marker:#E2572B;
+    --marker-dark:#C4441C;
+    --pencil:#42433D;
+    --pencil-light:#8C8C82;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:#3a3229;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255,255,255,0.03) 0%, transparent 50%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Space Grotesk', sans-serif;
+    padding:24px;
+  }
+  .device-note{
+    position:fixed; top:14px; left:50%; transform:translateX(-50%);
+    color:#c9bda8; font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+    font-family:'Space Grotesk',sans-serif; opacity:.6;
+  }
+  .phone{
+    width:390px;
+    max-width:100%;
+    height:820px;
+    background:var(--paper);
+    border-radius:38px;
+    border:10px solid #17140f;
+    box-shadow:0 30px 60px rgba(0,0,0,0.5), 0 0 0 2px #2a251c;
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .statusbar{
+    height:30px;
+    background:var(--chalk-deep);
+    color:var(--paper);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 22px;
+    font-size:11px;
+    font-weight:600;
+    flex-shrink:0;
+  }
+  .screens{
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    position:relative;
+    scroll-behavior:smooth;
+  }
+  .screens::-webkit-scrollbar{display:none;}
+  .screen{ display:none; padding-bottom:90px; min-height:100%; }
+  .screen.active{ display:block; animation:fadeIn .35s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  /* torn paper card - signature element */
+  .torn-card{
+    background:var(--paper);
+    position:relative;
+    clip-path: polygon(
+      0% 2%, 3% 0%, 12% 1.5%, 22% 0%, 34% 1.2%, 47% 0%, 58% 1.5%, 71% 0%, 83% 1.2%, 94% 0%, 100% 2%,
+      100% 97%, 96% 100%, 88% 98.5%, 76% 100%, 64% 98.3%, 52% 100%, 40% 98.7%, 28% 100%, 16% 98.5%, 5% 100%, 0% 98%
+    );
+    box-shadow:0 4px 14px rgba(0,0,0,0.12);
+  }
+
+  /* HEADER */
+  .topbar{
+    background:var(--chalk);
+    color:var(--paper);
+    padding:20px 20px 26px;
+    position:relative;
+    overflow:hidden;
+  }
+  .topbar::after{
+    content:"";
+    position:absolute; bottom:-1px; left:0; right:0; height:14px;
+    background:var(--paper);
+    clip-path: polygon(0% 100%, 2% 20%, 6% 80%, 11% 10%, 16% 70%, 21% 0%, 27% 60%, 33% 15%, 39% 75%, 45% 25%, 51% 65%, 57% 5%, 63% 70%, 69% 20%, 75% 60%, 81% 10%, 87% 75%, 93% 25%, 100% 60%, 100% 100%);
+  }
+  .brand-row{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{
+    width:38px; height:38px; border-radius:50%;
+    background:var(--marker);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Kalam',cursive; font-weight:700; color:var(--paper); font-size:19px;
+    transform:rotate(-6deg);
+    flex-shrink:0;
+  }
+  .brand-name{ font-size:14px; font-weight:700; letter-spacing:.02em; }
+  .brand-sub{ font-size:10px; color:var(--kraft-light); text-transform:uppercase; letter-spacing:.08em; }
+  .screen-title{
+    font-family:'Kalam',cursive; font-weight:700;
+    font-size:26px; margin-top:16px; line-height:1.15;
+  }
+  .screen-sub{ font-size:12.5px; color:var(--kraft-light); margin-top:6px; line-height:1.5; max-width:280px;}
+
+  .content{ padding:20px; }
+  .eyebrow{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:.14em;
+    color:var(--marker-dark); font-weight:700; margin-bottom:6px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .eyebrow::before{ content:"✂"; font-size:11px; }
+  h2.section-h{
+    font-family:'Kalam',cursive; font-weight:700; font-size:21px;
+    color:var(--chalk); margin-bottom:4px;
+  }
+  p.body-text{ font-size:13px; color:var(--pencil); line-height:1.65; margin-bottom:14px; }
+
+  /* HOME */
+  .stat-row{ display:flex; gap:10px; margin:18px 0 4px; }
+  .stat-pill{
+    flex:1; background:var(--kraft-light); border-radius:14px; padding:12px 10px;
+    text-align:center;
+  }
+  .stat-num{ font-family:'Kalam',cursive; font-weight:700; font-size:20px; color:var(--chalk); }
+  .stat-lbl{ font-size:9px; text-transform:uppercase; letter-spacing:.05em; color:var(--cardboard); margin-top:2px; }
+
+  .cta-btn{
+    display:block; width:100%; text-align:center;
+    background:var(--marker); color:var(--paper);
+    font-weight:600; font-size:13.5px;
+    padding:13px; border-radius:12px; border:none;
+    margin-top:6px; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif;
+    box-shadow:0 4px 0 var(--marker-dark);
+    transition:transform .1s;
+  }
+  .cta-btn:active{ transform:translateY(3px); box-shadow:0 1px 0 var(--marker-dark); }
+  .cta-outline{
+    background:transparent; color:var(--chalk); border:2px solid var(--chalk);
+    box-shadow:none; font-weight:600;
+  }
+
+  .mini-card{
+    background:var(--paper); border:1.5px solid var(--kraft);
+    border-radius:14px; padding:14px; margin-bottom:12px;
+    display:flex; gap:12px; align-items:flex-start;
+    cursor:pointer;
+  }
+  .mini-icon{
+    width:38px;height:38px;border-radius:10px;background:var(--chalk);
+    display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+  }
+  .mini-title{ font-size:13.5px; font-weight:700; color:var(--chalk); margin-bottom:3px;}
+  .mini-desc{ font-size:11.5px; color:var(--pencil-light); line-height:1.5;}
+
+  /* MISSION VISION */
+  .mv-card{
+    border-radius:16px; padding:16px; margin-bottom:12px; color:var(--paper);
+  }
+  .mv-card.mission{ background:var(--chalk); }
+  .mv-card.vision{ background:var(--cardboard); }
+  .mv-tag{ font-family:'Kalam',cursive; font-weight:700; font-size:15px; margin-bottom:6px; }
+  .mv-text{ font-size:12.5px; line-height:1.6; opacity:.95; }
+
+  /* FOUNDER */
+  .founder-photo{
+    width:100%; height:190px; border-radius:16px;
+    background:linear-gradient(135deg,var(--kraft),var(--cardboard));
+    display:flex; align-items:center; justify-content:center;
+    color:var(--paper); font-size:12px; text-align:center; padding:20px;
+    margin-bottom:14px; position:relative;
+  }
+  .quote-mark{ font-family:'Kalam',cursive; font-size:44px; color:var(--marker); line-height:0.5; }
+
+  /* PROGRAMS */
+  .prog-card{
+    border-radius:16px; padding:16px; margin-bottom:14px;
+    border:1.5px solid var(--kraft); background:var(--paper);
+  }
+  .prog-tag{
+    display:inline-block; font-size:9.5px; text-transform:uppercase; letter-spacing:.08em;
+    background:var(--kraft-light); color:var(--cardboard); padding:3px 9px; border-radius:20px;
+    margin-bottom:8px; font-weight:700;
+  }
+  .prompt-note{
+    font-size:10.5px; color:var(--marker-dark); font-weight:700; text-transform:uppercase;
+    letter-spacing:.05em; margin:2px 0 8px;
+  }
+  .topic-list{ list-style:none; margin:0 0 12px; }
+  .topic-list li{
+    font-size:12px; color:var(--pencil); line-height:1.5;
+    padding:7px 0 7px 24px; position:relative;
+    border-bottom:1px dashed var(--kraft);
+  }
+  .topic-list li:last-child{ border-bottom:none; }
+  .topic-list li::before{
+    content:"✎"; position:absolute; left:2px; top:7px;
+    color:var(--marker); font-size:12px;
+  }
+  .topic-list li b{ color:var(--chalk); }
+
+  /* AWARDS / GALLERY */
+  .gallery-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .g-tile{
+    aspect-ratio:1; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--paper); font-size:24px;
+  }
+
+  .badge-row{ display:flex; align-items:center; gap:12px; background:var(--kraft-light); border-radius:14px; padding:12px; margin-bottom:10px; }
+  .badge-icon{ font-size:26px; }
+  .badge-t{ font-size:13px; font-weight:700; color:var(--chalk); }
+  .badge-d{ font-size:11px; color:var(--cardboard); }
+
+  /* CONTACT / FORM */
+  .field{ margin-bottom:12px; }
+  .field label{ font-size:11px; font-weight:700; color:var(--chalk); display:block; margin-bottom:5px; }
+  .field input, .field select, .field textarea{
+    width:100%; padding:10px 12px; border-radius:10px; border:1.5px solid var(--kraft);
+    font-family:'Space Grotesk',sans-serif; font-size:12.5px; background:var(--paper); color:var(--pencil);
+  }
+  .field textarea{ resize:none; height:60px; }
+
+  /* MODAL */
+  .modal-overlay{
+    position:absolute; inset:0; background:rgba(20,17,12,0.55);
+    display:none; align-items:flex-end; z-index:50;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-sheet{
+    background:var(--paper); width:100%; border-radius:22px 22px 0 0;
+    padding:22px 20px 26px; max-height:80%; overflow-y:auto;
+    animation:slideUp .3s ease;
+  }
+  @keyframes slideUp{ from{transform:translateY(100%);} to{transform:translateY(0);} }
+  .modal-handle{ width:38px; height:4px; background:var(--kraft); border-radius:4px; margin:0 auto 16px; }
+  .modal-close{ position:absolute; top:14px; right:18px; font-size:20px; color:var(--pencil); cursor:pointer; z-index:51;}
+  .success-box{ text-align:center; padding:30px 10px; }
+  .success-box .tick{ font-size:44px; margin-bottom:10px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav{
+    position:absolute; bottom:0; left:0; right:0; height:74px;
+    background:var(--chalk-deep);
+    display:flex; align-items:center; justify-content:space-around;
+    padding-bottom:14px; z-index:20;
+    border-top:1px solid #000;
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    color:#7a8378; cursor:pointer; font-size:9px; font-weight:600;
+    letter-spacing:.02em; width:56px;
+  }
+  .nav-item.active{ color:var(--marker); }
+  .nav-icon{ font-size:18px; }
+
+  .divider-torn{
+    height:10px; margin:4px 0 16px;
+    background:repeating-linear-gradient(45deg, var(--kraft) 0 6px, transparent 6px 12px);
+    opacity:.4; border-radius:4px;
+  }
+
+  /* AI CHATBOT */
+  .chat-fab{
+    position:absolute; right:16px; bottom:88px; z-index:30;
+    width:52px; height:52px; border-radius:50%;
+    background:var(--marker); color:var(--paper); border:none;
+    font-size:24px; cursor:pointer;
+    box-shadow:0 6px 16px rgba(0,0,0,0.35), 0 3px 0 var(--marker-dark);
+    display:flex; align-items:center; justify-content:center;
+    transform:rotate(-6deg);
+  }
+  .chat-fab:active{ transform:rotate(-6deg) translateY(2px); }
+  .chat-panel{
+    position:absolute; inset:0 0 74px 0; z-index:40;
+    background:var(--paper); display:none; flex-direction:column;
+  }
+  .chat-panel.show{ display:flex; animation:fadeIn .25s ease; }
+  .chat-head{
+    background:var(--chalk); color:var(--paper); padding:16px 18px;
+    display:flex; align-items:center; gap:10px; flex-shrink:0;
+  }
+  .chat-head .logo-mark{ width:34px; height:34px; font-size:16px; }
+  .chat-head-t{ font-size:14px; font-weight:700; }
+  .chat-head-s{ font-size:10px; color:var(--kraft-light); }
+  .chat-close{ margin-left:auto; font-size:20px; cursor:pointer; color:var(--paper); }
+  .chat-body{ flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
+  .chat-body::-webkit-scrollbar{ display:none; }
+  .bubble{
+    max-width:80%; padding:10px 13px; border-radius:14px;
+    font-size:12.5px; line-height:1.5;
+  }
+  .bubble.bot{ background:var(--kraft-light); color:var(--pencil); align-self:flex-start; border-bottom-left-radius:4px; }
+  .bubble.user{ background:var(--marker); color:var(--paper); align-self:flex-end; border-bottom-right-radius:4px; }
+  .chat-chips{ display:flex; flex-wrap:wrap; gap:6px; padding:0 16px 8px; }
+  .chip{
+    font-size:11px; background:var(--paper); border:1.5px solid var(--kraft);
+    color:var(--chalk); padding:6px 11px; border-radius:20px; cursor:pointer; font-weight:600;
+  }
+  .chat-input-row{
+    display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--kraft); flex-shrink:0;
+  }
+  .chat-input-row input{
+    flex:1; padding:10px 12px; border-radius:20px; border:1.5px solid var(--kraft);
+    font-family:'Space Grotesk',sans-serif; font-size:12.5px; background:var(--paper); color:var(--pencil);
+  }
+  .chat-send{
+    width:40px; height:40px; border-radius:50%; border:none; background:var(--marker);
+    color:var(--paper); font-size:16px; cursor:pointer; flex-shrink:0;
+  }
+
+  /* AWARD GALLERY (real photos + captions) */
+  .feature-award{
+    background:var(--paper); border:1.5px solid var(--kraft); border-radius:16px;
+    overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,0.12); margin-bottom:16px;
+  }
+  .feature-award img{ width:100%; height:180px; object-fit:cover; display:block; }
+  .feature-award .fa-body{ padding:14px 16px 16px; }
+  .award-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .award-card{
+    background:var(--paper); border:1.5px solid var(--kraft); border-radius:14px;
+    overflow:hidden; box-shadow:0 3px 10px rgba(0,0,0,0.08);
+  }
+  .award-card img{
+    width:100%; height:110px; object-fit:cover; display:block;
+    border-bottom:1.5px solid var(--kraft);
+  }
+  .award-cap{ padding:9px 10px 11px; }
+  .award-name{ font-size:12px; font-weight:700; color:var(--chalk); line-height:1.2; }
+  .award-meta{ font-size:10px; color:var(--cardboard); margin-top:3px; line-height:1.4; }
+  .award-year{
+    display:inline-block; font-size:8.5px; font-weight:700; color:var(--marker-dark);
+    background:var(--kraft-light); padding:2px 7px; border-radius:10px; margin-top:7px;
+    text-transform:uppercase; letter-spacing:.04em;
+  }
+  .photo-credit{ font-size:9.5px; color:var(--pencil-light); margin-top:12px; text-align:center; }
+
+  /* SEGMENTED TOGGLE (worksheet parts) */
+  .seg{ display:flex; background:var(--kraft-light); border-radius:12px; padding:4px; margin-bottom:16px; }
+  .seg button{
+    flex:1; border:none; background:transparent; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:11.5px;
+    color:var(--cardboard); padding:9px 6px; border-radius:9px; line-height:1.3;
+  }
+  .seg button.active{ background:var(--paper); color:var(--chalk); box-shadow:0 2px 5px rgba(0,0,0,0.12); }
+
+  /* INNOVATION LAB WORKSHEET */
+  .ws-part{ display:none; }
+  .ws-part.active{ display:block; }
+  .ws-intro{ font-size:12px; color:var(--pencil); line-height:1.6; margin-bottom:16px; }
+  .ws-step{ margin-bottom:22px; }
+  .ws-step-head{ display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .ws-step-num{
+    font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+    background:var(--marker); color:var(--paper); padding:3px 8px; border-radius:10px; flex-shrink:0;
+  }
+  .ws-step-title{ font-family:'Kalam',cursive; font-weight:700; font-size:17px; color:var(--chalk); }
+  .ws-hint{ font-size:11px; color:var(--pencil-light); line-height:1.5; margin-bottom:10px; font-style:italic; }
+  .ws-field{ margin-bottom:10px; }
+  .ws-field label{ font-size:11px; font-weight:700; color:var(--chalk); display:block; margin-bottom:5px; }
+  .ws-field textarea, .ws-field input{
+    width:100%; padding:9px 11px; border-radius:10px; border:1.5px solid var(--kraft);
+    font-family:'Space Grotesk',sans-serif; font-size:12px; background:#fffdf8; color:var(--pencil); resize:vertical;
+  }
+  .ws-field textarea{ min-height:52px; }
+  .ws-two{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .ws-box{ border:1.5px solid var(--kraft); border-radius:12px; padding:11px; margin-bottom:10px; background:var(--paper); }
+  .ws-box-t{ font-size:11px; font-weight:700; color:var(--marker-dark); margin-bottom:8px; text-transform:uppercase; letter-spacing:.04em; }
+</style>
+</head>
+<body>
+<div class="device-note">Sample App Preview — scroll each screen, tap bottom tabs</div>
+<div class="phone">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span>IMF App</span>
+    <span>100%</span>
+  </div>
+
+  <div class="screens">
+
+    <!-- HOME -->
+    <div class="screen active" id="screen-home">
+      <div class="topbar">
+        <div class="brand-row">
+          <div class="logo-mark">IM</div>
+          <div>
+            <div class="brand-name">Innovation Movement<br>Foundation</div>
+          </div>
+        </div>
+        <div class="screen-title">Turn Ideas<br>Into Action.</div>
+        <div class="screen-sub">Building creative thinkers, financially literate youth, and sustainable innovators — 100% digital.</div>
+      </div>
+      <div class="content">
+        <div class="stat-row">
+          <div class="stat-pill"><div class="stat-num">3</div><div class="stat-lbl">Programs</div></div>
+          <div class="stat-pill"><div class="stat-num">100%</div><div class="stat-lbl">Digital</div></div>
+          <div class="stat-pill"><div class="stat-num">∞</div><div class="stat-lbl">Ideas</div></div>
+        </div>
+        <button class="cta-btn" onclick="go('programs')">Apply to a Program</button>
+        <button class="cta-btn cta-outline" onclick="go('about')" style="margin-top:10px;">Our Mission &amp; Vision</button>
+
+        <div class="divider-torn" style="margin-top:22px;"></div>
+        <div class="eyebrow">Explore</div>
+        <h2 class="section-h" style="margin-bottom:12px;">What We Do</h2>
+
+        <div class="mini-card" onclick="go('prog-problem')">
+          <div class="mini-icon">🧩</div>
+          <div><div class="mini-title">Problem-Solving Skills</div><div class="mini-desc">Creative thinking workshops for students &amp; youth.</div></div>
+        </div>
+        <div class="mini-card" onclick="go('prog-finance')">
+          <div class="mini-icon">💰</div>
+          <div><div class="mini-title">Financial Literacy</div><div class="mini-desc">Practical money skills for the next generation.</div></div>
+        </div>
+        <div class="mini-card" onclick="go('lab')">
+          <div class="mini-icon">♻️</div>
+          <div><div class="mini-title">Innovation Lab</div><div class="mini-desc">Hands-on worksheet — build with discarded waste, paper &amp; pen.</div></div>
+        </div>
+        <div class="mini-card" onclick="go('founder')">
+          <div class="mini-icon">🖋️</div>
+          <div><div class="mini-title">Founder's Message</div><div class="mini-desc">Why this movement began.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="screen" id="screen-about">
+      <div class="topbar">
+        <div class="eyebrow" style="color:var(--marker);">About Us</div>
+        <div class="screen-title">Who We Are</div>
+        <div class="screen-sub">A 100% digital platform for innovation, sustainability &amp; skill-building.</div>
+      </div>
+      <div class="content">
+        <span class="prog-tag" style="margin-bottom:12px;">Established February 2026 · Section 8 Not-for-Profit</span>
+        <p class="body-text">Innovation Movement Foundation works towards developing creative thinking, problem-solving skills, financial literacy, research awareness, and innovation among students, youth, and researchers.</p>
+        <p class="body-text">The Foundation connects education with real-life skills through digital learning, practical activities, innovation challenges, and sustainable Innovation Labs built from discarded and waste materials. It encourages young minds to observe problems, think creatively, understand money wisely, and convert simple ideas into useful solutions for the Nation and the world.</p>
+        <p class="body-text">Through certificates, appreciation awards, workshops, and digital platforms, we nurture confident students who become solution-makers, innovators, and responsible citizens of the future.</p>
+
+        <div class="mv-card mission">
+          <div class="mv-tag">🎯 Our Mission</div>
+          <div class="mv-text">To empower students, youth, and researchers with creative thinking, problem-solving, financial literacy, and innovation skills — helping them turn simple ideas and waste into practical, real, sustainable solutions for the Nation.</div>
+        </div>
+        <div class="mv-card vision">
+          <div class="mv-tag">🔭 Our Vision</div>
+          <div class="mv-text">To develop a strong culture of innovation, creative thinking, and problem-solving — from school to employment and entrepreneurship.</div>
+        </div>
+
+        <button class="cta-btn cta-outline" onclick="go('founder')">Meet Our Founder →</button>
+      </div>
+    </div>
+
+    <!-- FOUNDER -->
+    <div class="screen" id="screen-founder">
+      <div class="topbar">
+        <div class="eyebrow" style="color:var(--marker);">Founder's Message</div>
+        <div class="screen-title">Meet Our Founder</div>
+      </div>
+      <div class="content">
+        <div class="founder-photo">[ Founder Photograph ]</div>
+        <div class="quote-mark">"</div>
+        <p class="body-text" style="margin-top:-10px;">We started this movement believing that innovation shouldn't need a big budget — just curiosity, a piece of scrap paper, and the courage to try. Every certificate we give isn't just an award, it's a promise that someone's idea mattered.</p>
+        <p class="body-text">Since 2015, the founder has been igniting India's youth innovation ecosystem — founding <b>innovateinindia.com</b> and spearheading <i>"Solution Enrich Earth,"</i> a movement that blends modern science with ancient wisdom to nurture creativity, sustainability, and human potential. Our dream is to create a strong innovation culture from school level to employment and entrepreneurship.</p>
+        <p class="body-text" style="font-weight:700; color:var(--chalk);">Sanjay Kumar Sinha<br><span style="font-weight:400; color:var(--pencil-light); font-size:11px;">Founder &amp; Director, Innovation Movement Foundation<br>Research Scholar · ISCA Life Member · Author · Innovation Promoter</span></p>
+      </div>
+    </div>
+
+    <!-- PROGRAMS (parent) -->
+    <div class="screen" id="screen-programs">
+      <div class="topbar">
+        <div class="eyebrow" style="color:var(--marker);">Our Programs</div>
+        <div class="screen-title">Pick a Path,<br>Start Building.</div>
+        <div class="screen-sub">Three programs. One goal — turn ideas into action.</div>
+      </div>
+      <div class="content">
+        <div class="prog-card">
+          <span class="prog-tag">Program 01</span>
+          <h2 class="section-h">Problem-Solving Skills</h2>
+          <p class="body-text" style="margin-bottom:4px;">Build creative thinking and real-world problem-solving.</p>
+          <div class="prompt-note">Choose any one · Write 100–150 words &amp; send</div>
+          <ul class="topic-list">
+            <li><b>Future Foods.</b> What will be on our plate?</li>
+            <li><b>The Circular Economy.</b> How can business introduce more circular processes?</li>
+            <li><b>Air Pollution.</b> Who is responsible?</li>
+            <li><b>Gen Z.</b> How powerful are they?</li>
+            <li><b>Leadership for Change.</b> The role of leadership, entrepreneurial spirit, and change-makers.</li>
+          </ul>
+          <button class="cta-btn" style="margin-top:0;" onclick="openModal('problem')">Apply Now</button>
+        </div>
+        <div class="prog-card">
+          <span class="prog-tag">Program 02</span>
+          <h2 class="section-h">Financial Literacy</h2>
+          <p class="body-text" style="margin-bottom:4px;">Practical money-management skills for students and young professionals.</p>
+          <div class="prompt-note">Choose any one · Write 100–150 words &amp; submit</div>
+          <ul class="topic-list">
+            <li><b>Part-Time Earning.</b> If you could earn money while studying, what work would you choose and why?</li>
+            <li><b>Pocket Money.</b> If you receive ₹1,000, how will you divide it among spending, saving, investing, and giving?</li>
+            <li><b>Saving &amp; Investing.</b> How can saving and investing together build a financially secure future? <i>(Or: why is money in a piggy bank different from money in a bank, bonds, or stocks?)</i></li>
+            <li><b>Needs &amp; Wants.</b> How does knowing the difference help you manage money wisely?</li>
+            <li><b>Money &amp; the Nation.</b> How can wise saving and investment help businesses, create jobs, and support the country's growth?</li>
+          </ul>
+          <button class="cta-btn" style="margin-top:0;" onclick="openModal('finance')">Apply Now</button>
+        </div>
+        <div class="prog-card">
+          <span class="prog-tag">Program 03</span>
+          <h2 class="section-h">Innovation Lab</h2>
+          <p class="body-text" style="margin-bottom:4px;">A hands-on digital worksheet for ages 10–17. Choose Part A or Part B and work through five guided steps.</p>
+          <div class="prompt-note">Choose Part A or Part B</div>
+          <ul class="topic-list">
+            <li><b>Part A — General Innovation Process.</b> Find any real-world problem and design a solution.</li>
+            <li><b>Part B — Waste to Wonder.</b> Turn a discarded item into a brand-new product.</li>
+          </ul>
+          <button class="cta-btn" style="margin-top:0;" onclick="go('lab')">Open Worksheet →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INNOVATION LAB WORKSHEET -->
+    <div class="screen" id="screen-lab">
+      <div class="topbar">
+        <div class="eyebrow" style="color:var(--marker);">Program 03 · Innovation Lab</div>
+        <div class="screen-title">My Innovation Lab</div>
+        <div class="screen-sub">Innovation Lab Worksheet • Ages 10–17. Spot a problem, design a solution, test it with others.</div>
+      </div>
+      <div class="content">
+        <div class="ws-two" style="grid-template-columns:1fr 1fr; gap:8px;">
+          <div class="ws-field"><label>My Name</label><input type="text" data-q="My Name" placeholder="Your name"></div>
+          <div class="ws-field"><label>Date</label><input type="text" data-q="Date" placeholder="DD/MM/YYYY"></div>
+        </div>
+        <div class="ws-field"><label>My Team</label><input type="text" data-q="My Team" placeholder="Teammates (optional)"></div>
+
+        <div class="seg">
+          <button id="seg-a" class="active" onclick="showPart('a')">Part A · Innovation Process</button>
+          <button id="seg-b" onclick="showPart('b')">Part B · Waste to Wonder</button>
+        </div>
+
+        <!-- PART A -->
+        <div class="ws-part active" id="ws-part-a">
+          <span class="prog-tag">Part A</span>
+          <h2 class="section-h">General Innovation Process</h2>
+          <p class="ws-intro">Every great invention starts with someone noticing a problem worth solving. Work through five steps: spotting real problems, choosing one, generating ideas, narrowing to something testable, and getting feedback. Use words or sketches — whatever helps you think.</p>
+
+          <div class="ws-step">
+            <div class="ws-step-head"><span class="ws-step-num">Step 1</span><span class="ws-step-title">Spot the Problems</span></div>
+            <div class="ws-hint">Think about daily life — at home, school, online, or in your neighbourhood. Identify 3 problems that are frustrating, inefficient, or harder than they should be.</div>
+            <div class="ws-field"><label>Problem #1 — describe it</label><textarea data-q="A · Problem #1"></textarea></div>
+            <div class="ws-field"><label>Problem #2 — describe it</label><textarea data-q="A · Problem #2"></textarea></div>
+            <div class="ws-field"><label>Problem #3 — describe it</label><textarea data-q="A · Problem #3"></textarea></div>
+          </div>
+
+          <div class="ws-step">
+            <div class="ws-step-head"><span class="ws-step-num">Step 2</span><span class="ws-step-title">Choose Your Problem</span></div>
+            <div class="ws-hint">Review your 3 problems and choose the ONE you most want to work on.</div>
+            <div class="ws-field"><label>The problem I'm choosing to solve</label><textarea data-q="A · Chosen problem"></textarea></div>
+            <div class="ws-field"><label>Who else experiences this problem? (how many people, or describe the group)</label><textarea data-q="A · Who else experiences it"></textarea></div>
+            <div class="ws-field"><label>Why does solving this matter? What changes if it's fixed?</label><textarea data-q="A · Why it matters"></textarea></div>
+            <div class="ws-hint">Check your assumption. Write 3–4 questions, then ask at least 3 people and record their answers.</div>
+            <div class="ws-field"><label>My survey questions</label>
+              <input type="text" data-q="A · Survey Q1" placeholder="1." style="margin-bottom:6px;">
+              <input type="text" data-q="A · Survey Q2" placeholder="2." style="margin-bottom:6px;">
+              <input type="text" data-q="A · Survey Q3" placeholder="3." style="margin-bottom:6px;">
+              <input type="text" data-q="A · Survey Q4" placeholder="4.">
+            </div>
+            <div class="ws-box">
+              <div class="ws-box-t">Survey Results Log</div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="A · Asked 1 (who)" placeholder="Who I asked"><input type="text" data-q="A · Asked 1 (said)" placeholder="What they said"></div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="A · Asked 2 (who)" placeholder="Who I asked"><input type="text" data-q="A · Asked 2 (said)" placeholder="What they said"></div>
+              <div class="ws-two"><input type="text" data-q="A · Asked 3 (who)" placeholder="Who I asked"><input type="text" data-q="A · Asked 3 (said)" placeholder="What they said"></div>
+            </div>
+            <div class="ws-field"><label>What did the survey confirm or change about how I see this problem?</label><textarea data-q="A · Survey takeaway"></textarea></div>
+          </div>
+
+          <div class="ws-step">
+            <div class="ws-step-head"><span class="ws-step-num">Step 3</span><span class="ws-step-title">Generate Ideas</span></div>
+            <div class="ws-hint">Brainstorm freely — quantity over quality. Imagine unlimited time, tools, and support. Capture at least 2 directions.</div>
+            <div class="ws-two">
+              <div class="ws-field"><label>Idea A</label><textarea data-q="A · Idea A"></textarea></div>
+              <div class="ws-field"><label>Idea B</label><textarea data-q="A · Idea B"></textarea></div>
+            </div>
+          </div>
+
+          <div class="ws-step">
+            <div class="ws-step-head"><span class="ws-step-num">Step 4</span><span class="ws-step-title">Narrow It Down</span></div>
+            <div class="ws-hint">Choose your strongest idea, then scale it down to the smallest version you could test this week using things you already have.</div>
+            <div class="ws-field"><label>My strongest idea is</label><textarea data-q="A · Strongest idea"></textarea></div>
+            <div class="ws-field"><label>The smallest version I could test this week</label><textarea data-q="A · Smallest test"></textarea></div>
+            <div class="ws-field"><label>What materials, information, or support do I need?</label><textarea data-q="A · Materials needed"></textarea></div>
+          </div>
+
+          <div class="ws-step">
+            <div class="ws-step-head"><span class="ws-step-num">Step 5</span><span class="ws-step-title">Get Feedback</span></div>
+            <div class="ws-hint">Present your idea to your team in 1–2 minutes. Record their feedback and any new suggestions.</div>
+            <div class="ws-box">
+              <div class="ws-box-t">Teammate Feedback</div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="A · Teammate 1" placeholder="Teammate name"><input type="text" data-q="A · Feedback 1" placeholder="Feedback / suggestion"></div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="A · Teammate 2" placeholder="Teammate name"><input type="text" data-q="A · Feedback 2" placeholder="Feedback / suggestion"></div>
+              <div class="ws-two"><input type="text" data-q="A · Teammate 3" placeholder="Teammate name"><input type="text" data-q="A · Feedback 3" placeholder="Feedback / suggestion"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PART B -->
+        <div class="ws-part" id="ws-part-b">
+          <span class="prog-tag" style="background:#d7e6d2; color:#2f6b34;">Part B</span>
+          <h2 class="section-h">Waste to Wonder</h2>
+          <p class="ws-intro">Every day, useful materials get thrown away — plastic, cardboard, cloth, metal, glass, electronics, food scraps. Look closely at waste, understand the problem it creates, and design a brand-new product made from it.</p>
+
+          <div class="ws-step">
+            <div class="ws-step-head"><span class="ws-step-num">Step 1</span><span class="ws-step-title">Spot the Waste Problem</span></div>
+            <div class="ws-hint">Identify 3 discarded items or types of waste you see often. For each, note where it comes from, where it usually ends up, and why that's a problem.</div>
+            <div class="ws-box">
+              <div class="ws-box-t">Waste Item 1</div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="B · Waste 1 item" placeholder="Waste item"><input type="text" data-q="B · Waste 1 from" placeholder="Where it comes from"></div>
+              <div class="ws-two"><input type="text" data-q="B · Waste 1 ends" placeholder="Where it ends up"><input type="text" data-q="B · Waste 1 problem" placeholder="Why that's a problem"></div>
+            </div>
+            <div class="ws-box">
+              <div class="ws-box-t">Waste Item 2</div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="B · Waste 2 item" placeholder="Waste item"><input type="text" data-q="B · Waste 2 from" placeholder="Where it comes from"></div>
+              <div class="ws-two"><input type="text" data-q="B · Waste 2 ends" placeholder="Where it ends up"><input type="text" data-q="B · Waste 2 problem" placeholder="Why that's a problem"></div>
+            </div>
+            <div class="ws-box">
+              <div class="ws-box-t">Waste Item 3</div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="B · Waste 3 item" placeholder="Waste item"><input type="text" data-q="B · Waste 3 from" placeholder="Where it comes from"></div>
+              <div class="ws-two"><input type="text" data-q="B · Waste 3 ends" placeholder="Where it ends up"><input type="text" data-q="B · Waste 3 problem" placeholder="Why that's a problem"></div>
+            </div>
+            <div class="ws-field"><label>Sketch / describe the waste item I'm exploring (shape, material, parts)</label><textarea data-q="B · Sketch note"></textarea></div>
+          </div>
+
+          <div class="ws-step">
+            <div class="ws-step-head"><span class="ws-step-num">Step 2</span><span class="ws-step-title">Choose Your Waste Item &amp; Investigate</span></div>
+            <div class="ws-hint">Pick ONE waste item to work with for the rest of this challenge.</div>
+            <div class="ws-field"><label>The waste item I'm choosing</label><textarea data-q="B · Chosen waste item"></textarea></div>
+            <div class="ws-field"><label>How much of it is generated? (e.g. per household per week, per school per day — estimate if unsure)</label><textarea data-q="B · How much generated"></textarea></div>
+            <div class="ws-hint">Check your assumptions. Write 3–4 questions about this waste item, then ask at least 3 people.</div>
+            <div class="ws-field"><label>My survey questions</label>
+              <input type="text" data-q="B · Survey Q1" placeholder="1." style="margin-bottom:6px;">
+              <input type="text" data-q="B · Survey Q2" placeholder="2." style="margin-bottom:6px;">
+              <input type="text" data-q="B · Survey Q3" placeholder="3." style="margin-bottom:6px;">
+              <input type="text" data-q="B · Survey Q4" placeholder="4.">
+            </div>
+            <div class="ws-box">
+              <div class="ws-box-t">Survey Results Log</div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="B · Asked 1 (who)" placeholder="Who I asked"><input type="text" data-q="B · Asked 1 (said)" placeholder="What they said"></div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="B · Asked 2 (who)" placeholder="Who I asked"><input type="text" data-q="B · Asked 2 (said)" placeholder="What they said"></div>
+              <div class="ws-two"><input type="text" data-q="B · Asked 3 (who)" placeholder="Who I asked"><input type="text" data-q="B · Asked 3 (said)" placeholder="What they said"></div>
+            </div>
+          </div>
+
+          <div class="ws-step">
+            <div class="ws-step-head"><span class="ws-step-num">Step 3</span><span class="ws-step-title">Design a New Product</span></div>
+            <div class="ws-hint">Imagine what this waste item could become — think about its shape, material, and strength. Generate at least 2 product ideas.</div>
+            <div class="ws-box">
+              <div class="ws-box-t">Product Idea A</div>
+              <div class="ws-field" style="margin-bottom:8px;"><label>What is it?</label><textarea data-q="B · Product A what"></textarea></div>
+              <div class="ws-field" style="margin-bottom:0;"><label>Who would use it?</label><textarea data-q="B · Product A who"></textarea></div>
+            </div>
+            <div class="ws-box">
+              <div class="ws-box-t">Product Idea B</div>
+              <div class="ws-field" style="margin-bottom:8px;"><label>What is it?</label><textarea data-q="B · Product B what"></textarea></div>
+              <div class="ws-field" style="margin-bottom:0;"><label>Who would use it?</label><textarea data-q="B · Product B who"></textarea></div>
+            </div>
+          </div>
+
+          <div class="ws-step">
+            <div class="ws-step-head"><span class="ws-step-num">Step 4</span><span class="ws-step-title">Plan Your Prototype</span></div>
+            <div class="ws-hint">Choose your strongest product idea, then plan the smallest, simplest version you could build or test this week.</div>
+            <div class="ws-field"><label>The product I'm building</label><textarea data-q="B · Product building"></textarea></div>
+            <div class="ws-field"><label>How many waste items will I need, and where will I collect them?</label><textarea data-q="B · Items needed"></textarea></div>
+            <div class="ws-field"><label>What steps will I follow to make it? (list in order)</label><textarea data-q="B · Build steps"></textarea></div>
+            <div class="ws-field"><label>What other materials or tools do I need? (glue, scissors, paint, etc.)</label><textarea data-q="B · Tools needed"></textarea></div>
+          </div>
+
+          <div class="ws-step">
+            <div class="ws-step-head"><span class="ws-step-num">Step 5</span><span class="ws-step-title">Test &amp; Get Feedback</span></div>
+            <div class="ws-hint">Show your prototype or plan to your team. Does it solve the waste problem? Would they actually use it?</div>
+            <div class="ws-box">
+              <div class="ws-box-t">Teammate Feedback</div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="B · Teammate 1" placeholder="Teammate name"><input type="text" data-q="B · Feedback 1" placeholder="Feedback / suggestion"></div>
+              <div class="ws-two" style="margin-bottom:8px;"><input type="text" data-q="B · Teammate 2" placeholder="Teammate name"><input type="text" data-q="B · Feedback 2" placeholder="Feedback / suggestion"></div>
+              <div class="ws-two"><input type="text" data-q="B · Teammate 3" placeholder="Teammate name"><input type="text" data-q="B · Feedback 3" placeholder="Feedback / suggestion"></div>
+            </div>
+            <div class="ws-field"><label>Based on this feedback, what would I change or improve next?</label><textarea data-q="B · Improvements"></textarea></div>
+          </div>
+
+        </div>
+
+        <button class="cta-btn" style="margin-top:8px;" onclick="submitWorksheet()">Submit Worksheet to Foundation</button>
+        <button class="cta-btn cta-outline" style="margin-top:10px;" onclick="go('programs')">← Back to Programs</button>
+      </div>
+    </div>
+
+    <!-- AWARDS -->
+    <div class="screen" id="screen-awards">
+      <div class="topbar">
+        <div class="eyebrow" style="color:var(--marker);">Recognition</div>
+        <div class="screen-title">Celebrating Young<br>Innovators</div>
+        <div class="screen-sub">Every idea deserves recognition.</div>
+      </div>
+      <div class="content">
+        <div class="badge-row">
+          <div class="badge-icon">🏅</div>
+          <div><div class="badge-t">Innovation Award</div><div class="badge-d">For outstanding project innovation</div></div>
+        </div>
+        <div class="badge-row">
+          <div class="badge-icon">📜</div>
+          <div><div class="badge-t">Appreciation Certificate</div><div class="badge-d">For participation &amp; effort</div></div>
+        </div>
+        <div class="badge-row">
+          <div class="badge-icon">🎁</div>
+          <div><div class="badge-t">Memento</div><div class="badge-d">A keepsake to remember the journey</div></div>
+        </div>
+
+        <div class="divider-torn" style="margin-top:20px;"></div>
+        <div class="eyebrow">Gallery</div>
+        <h2 class="section-h" style="margin-bottom:12px;">Moments from the Movement</h2>
+
+        <div class="feature-award">
+          <img src="images/aakanksha.jpg" alt="Aakanksha of DPS Ranchi receiving her award">
+          <div class="fa-body">
+            <span class="prog-tag">Featured · 15 June 2017</span>
+            <h2 class="section-h">Aakanksha — DPS Ranchi</h2>
+            <p class="body-text" style="margin-bottom:0;">Aakanksha of Delhi Public School, Ranchi was awarded for her innovative ideas on eradicating unemployment — engaging local people in activities like painting and as tourist guides, helping curb joblessness to a great extent.</p>
+          </div>
+        </div>
+
+        <div class="award-grid">
+          <div class="award-card">
+            <img src="images/ankita.jpg" alt="Ankita Kumari receiving her award">
+            <div class="award-cap">
+              <div class="award-name">Ankita Kumari</div>
+              <div class="award-meta">Kendriya Vidyalaya, Sahibganj, Jharkhand — recognised in the field of Climate Change.</div>
+              <span class="award-year">2015</span>
+            </div>
+          </div>
+          <div class="award-card">
+            <img src="images/payal.jpg" alt="Payal Choudhary receiving her award">
+            <div class="award-cap">
+              <div class="award-name">Payal Choudhary</div>
+              <div class="award-meta">St. Xavier's School, Sahibganj, Jharkhand — recognised for Poverty Elimination.</div>
+              <span class="award-year">2016</span>
+            </div>
+          </div>
+          <div class="award-card">
+            <img src="images/adil.jpg" alt="Adil Ahmed receiving his award">
+            <div class="award-cap">
+              <div class="award-name">Adil Ahmed</div>
+              <div class="award-meta">Royal Global School, Guwahati, Assam — recognised for Poverty Elimination.</div>
+              <span class="award-year">2018</span>
+            </div>
+          </div>
+          <div class="award-card">
+            <img src="images/aakanksha.jpg" alt="Aakanksha receiving her award">
+            <div class="award-cap">
+              <div class="award-name">Aakanksha</div>
+              <div class="award-meta">Delhi Public School, Ranchi, Jharkhand — recognised for Tribal Poverty Elimination.</div>
+              <span class="award-year">2017</span>
+            </div>
+          </div>
+        </div>
+        <div class="photo-credit">Award photographs courtesy of innovateinindia.com</div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="screen" id="screen-contact">
+      <div class="topbar">
+        <div class="eyebrow" style="color:var(--marker);">Get In Touch</div>
+        <div class="screen-title">Let's Innovate<br>Together</div>
+      </div>
+      <div class="content">
+        <div class="badge-row" style="align-items:flex-start;">
+          <div class="badge-icon">📍</div>
+          <div><div class="badge-t">Address</div><div class="badge-d">Sector 8/947, Vikas Nagar,<br>Lucknow, Uttar Pradesh</div></div>
+        </div>
+        <div class="badge-row" style="align-items:flex-start;">
+          <div class="badge-icon">✉️</div>
+          <div><div class="badge-t">Email</div><div class="badge-d"><a href="mailto:innovateinindia@gmail.com" style="color:var(--cardboard); text-decoration:underline;">innovateinindia@gmail.com</a></div></div>
+        </div>
+        <div class="divider-torn" style="margin-top:16px;"></div>
+        <div class="eyebrow">Get In Touch</div>
+        <h2 class="section-h" style="margin-bottom:12px;">Let's Innovate Together</h2>
+        <div class="field"><label>Full Name</label><input id="c-name" type="text" data-q="Full Name" placeholder="Your name"></div>
+        <div class="field"><label>Email</label><input id="c-email" type="email" data-q="Email" placeholder="you@example.com"></div>
+        <div class="field"><label>Message</label><textarea id="c-msg" data-q="Message" placeholder="Tell us your idea..."></textarea></div>
+        <button class="cta-btn" onclick="sendContact()">Send Message</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL: Apply Form -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-sheet">
+      <div class="modal-close" onclick="closeModal()">✕</div>
+      <div class="modal-handle"></div>
+      <div id="modal-form-view">
+        <h2 class="section-h" id="modal-title">Apply Now</h2>
+        <p class="body-text" id="modal-sub">Fill in your details to apply.</p>
+        <div class="field"><label>Full Name</label><input type="text" data-q="Full Name" placeholder="Your name"></div>
+        <div class="field"><label>Age / Class</label><input type="text" data-q="Age / Class" placeholder="e.g. 16 / Grade 11"></div>
+        <div class="field"><label>Email</label><input type="email" data-q="Email" placeholder="you@example.com"></div>
+        <div class="field"><label>City</label><input type="text" data-q="City" placeholder="Your city"></div>
+        <div class="field"><label>Topic I'm choosing</label><input type="text" data-q="Chosen Topic" placeholder="e.g. Air Pollution — Who is responsible?"></div>
+        <div class="field"><label>My response (100–150 words)</label><textarea data-q="Response" style="height:100px;" placeholder="Write your answer here..."></textarea></div>
+        <button class="cta-btn" onclick="submitApply()">Submit Application</button>
+      </div>
+      <div id="modal-success-view" style="display:none;">
+        <div class="success-box">
+          <div class="tick">✅</div>
+          <h2 class="section-h">Application Received!</h2>
+          <p class="body-text">We'll reach out on your email with next steps.</p>
+          <button class="cta-btn cta-outline" onclick="closeModal()">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI CHATBOT -->
+  <button class="chat-fab" onclick="toggleChat()">🤖</button>
+  <div class="chat-panel" id="chat-panel">
+    <div class="chat-head">
+      <div class="logo-mark">IM</div>
+      <div>
+        <div class="chat-head-t">Movement Bot</div>
+        <div class="chat-head-s">AI Assistant · Always here to help</div>
+      </div>
+      <div class="chat-close" onclick="toggleChat()">✕</div>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="bubble bot">Hi! 👋 I'm the Innovation Movement Foundation assistant. Ask me about our programs, how to apply, awards, or how to reach us.</div>
+    </div>
+    <div class="chat-chips">
+      <div class="chip" onclick="botAsk('What programs do you offer?')">Our programs</div>
+      <div class="chip" onclick="botAsk('Tell me about the Innovation Lab worksheet')">Innovation Lab</div>
+      <div class="chip" onclick="botAsk('How do I apply?')">How to apply</div>
+      <div class="chip" onclick="botAsk('Tell me about the founder')">Founder</div>
+      <div class="chip" onclick="botAsk('How can I contact you?')">Contact</div>
+    </div>
+    <div class="chat-input-row">
+      <input id="chat-input" type="text" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendChat()">
+      <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item active" data-tab="home" onclick="go('home')"><div class="nav-icon">🏠</div>Home</div>
+    <div class="nav-item" data-tab="about" onclick="go('about')"><div class="nav-icon">📖</div>About</div>
+    <div class="nav-item" data-tab="programs" onclick="go('programs')"><div class="nav-icon">🧠</div>Programs</div>
+    <div class="nav-item" data-tab="awards" onclick="go('awards')"><div class="nav-icon">🏅</div>Awards</div>
+    <div class="nav-item" data-tab="contact" onclick="go('contact')"><div class="nav-icon">✉️</div>Contact</div>
+  </div>
+</div>
+
+<script>
+  const tabMap = {
+    home:'home', about:'about', founder:'founder',
+    programs:'programs', 'prog-problem':'programs', 'prog-finance':'programs', 'prog-lab':'programs',
+    lab:'programs', awards:'awards', contact:'contact'
+  };
+  function go(screenKey){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    let target = screenKey;
+    if(screenKey.startsWith('prog-')) target = 'programs';
+    const el = document.getElementById('screen-'+target);
+    if(el){ el.classList.add('active'); el.parentElement.scrollTop = 0; }
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    const navKey = tabMap[screenKey] || screenKey;
+    const nav = document.querySelector('.nav-item[data-tab="'+navKey+'"]');
+    if(nav) nav.classList.add('active');
+  }
+  /* ---- Foundation email submission (no backend needed) ---- */
+  const FOUNDATION_EMAIL = 'innovateinindia@gmail.com';
+  function fieldsToLines(nodeList){
+    const lines = [];
+    nodeList.forEach(el=>{
+      const v = (el.value || '').trim();
+      if(v) lines.push(el.getAttribute('data-q') + ': ' + v);
+    });
+    return lines;
+  }
+  function sendToFoundation(subject, lines){
+    const body = lines.length ? lines.join('\n\n') : '(No details entered)';
+    window.location.href = 'mailto:' + FOUNDATION_EMAIL +
+      '?subject=' + encodeURIComponent(subject) +
+      '&body='   + encodeURIComponent(body);
+  }
+
+  let currentProgram = 'Program';
+  const progInfo = {
+    problem:{title:'Problem-Solving Skills', sub:'Choose one topic and write 100–150 words.'},
+    finance:{title:'Financial Literacy', sub:'Choose one question and write 100–150 words.'}
+  };
+  function openModal(key){
+    currentProgram = progInfo[key].title;
+    document.getElementById('modal-title').innerText = 'Apply: ' + progInfo[key].title;
+    document.getElementById('modal-sub').innerHTML = progInfo[key].sub;
+    document.getElementById('modal-form-view').style.display='block';
+    document.getElementById('modal-success-view').style.display='none';
+    document.getElementById('modal').classList.add('show');
+  }
+  function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+  function submitApply(){
+    const lines = fieldsToLines(document.querySelectorAll('#modal-form-view [data-q]'));
+    sendToFoundation('Program Application — ' + currentProgram, lines);
+    document.getElementById('modal-form-view').style.display='none';
+    document.getElementById('modal-success-view').style.display='block';
+  }
+  function sendContact(){
+    const lines = fieldsToLines(document.querySelectorAll('#screen-contact [data-q]'));
+    sendToFoundation('Website Enquiry — Innovation Movement Foundation', lines);
+  }
+
+  /* ---- Innovation Lab worksheet ---- */
+  function showPart(p){
+    document.getElementById('ws-part-a').classList.toggle('active', p==='a');
+    document.getElementById('ws-part-b').classList.toggle('active', p==='b');
+    document.getElementById('seg-a').classList.toggle('active', p==='a');
+    document.getElementById('seg-b').classList.toggle('active', p==='b');
+    document.getElementById('screen-lab').parentElement.scrollTop = 0;
+  }
+  function submitWorksheet(){
+    const active = document.querySelector('.ws-part.active');
+    const partName = active.id === 'ws-part-a'
+      ? 'Part A — General Innovation Process'
+      : 'Part B — Waste to Wonder';
+    // identity fields sit outside the parts, then the active part's fields
+    const header = document.querySelectorAll('#screen-lab > .content > .ws-two [data-q], #screen-lab > .content > .ws-field [data-q]');
+    const lines = fieldsToLines(header).concat(fieldsToLines(active.querySelectorAll('[data-q]')));
+    sendToFoundation('Innovation Lab Worksheet — ' + partName, lines);
+    alert('Thank you! Your Innovation Lab worksheet (' + partName + ') has been prepared for ' + FOUNDATION_EMAIL + '. Please press send in your email app to submit it.');
+  }
+
+  /* ---- AI CHATBOT (rule-based demo) ---- */
+  function toggleChat(){ document.getElementById('chat-panel').classList.toggle('show'); }
+  function addBubble(text, who){
+    const body = document.getElementById('chat-body');
+    const b = document.createElement('div');
+    b.className = 'bubble ' + who;
+    b.innerHTML = text;
+    body.appendChild(b);
+    body.scrollTop = body.scrollHeight;
+  }
+  function botReply(msg){
+    const q = msg.toLowerCase();
+    if(/worksheet|waste to wonder|prototype|innovation lab|part a|part b/.test(q))
+      return "The <b>Innovation Lab</b> is a hands-on worksheet (ages 10–17). Choose <b>Part A</b> — find a real-world problem &amp; design a solution — or <b>Part B: Waste to Wonder</b> — turn a discarded item into a new product, then work through 5 guided steps. Open it from <b>Programs → Innovation Lab → Open Worksheet</b>. ♻️";
+    if(/program|course|problem|financ|money|lab/.test(q))
+      return "We run <b>3 programs</b>: 01 Problem-Solving Skills, 02 Financial Literacy, and 03 Innovation Lab. Open the <b>Programs</b> tab to see every topic.";
+    if(/apply|join|register|enroll|submit/.test(q))
+      return "To apply, open the <b>Programs</b> tab, pick a program, choose one topic, and tap <b>Apply Now</b>. Your answer is sent straight to <b>innovateinindia@gmail.com</b>. 📝";
+    if(/founder|sanjay|who started|director/.test(q))
+      return "Our founder is <b>Sanjay Kumar Sinha</b> — Research Scholar, ISCA Life Member, Author & Innovation Promoter. Since 2015 he has led innovateinindia.com and the 'Solution Enrich Earth' movement.";
+    if(/award|certificate|recogni|memento|prize/.test(q))
+      return "We recognise young innovators with <b>Innovation Awards, Appreciation Certificates, and Mementos</b>. See the <b>Awards</b> tab for featured stories! 🏅";
+    if(/contact|email|address|reach|phone|location/.test(q))
+      return "📍 Sector 8/947, Vikas Nagar, Lucknow. ✉️ <b>innovateinindia@gmail.com</b> — or use the form on the <b>Contact</b> tab.";
+    if(/mission|vision|about|who are you/.test(q))
+      return "Innovation Movement Foundation (est. Feb 2026, Section 8 non-profit) helps students, youth & researchers turn ideas — and even waste — into real, sustainable solutions. Check the <b>About</b> tab. 🌱";
+    if(/hi|hello|hey|namaste/.test(q))
+      return "Hello! 👋 How can I help — programs, applying, awards, or contact?";
+    if(/thank/.test(q))
+      return "You're welcome! Keep innovating. 💡";
+    return "I can help with <b>programs</b>, <b>how to apply</b>, our <b>founder</b>, <b>awards</b>, and <b>contact</b> details. Try one of the quick options above!";
+  }
+  function botAsk(msg){
+    addBubble(msg, 'user');
+    setTimeout(()=>addBubble(botReply(msg), 'bot'), 350);
+  }
+  function sendChat(){
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if(!msg) return;
+    input.value = '';
+    botAsk(msg);
+  }
+</script>
+</body>
+</html>

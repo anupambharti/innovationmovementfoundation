@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk 'NR>=12 && NR<=267' index.html)",
+      "Bash(awk '{n=gsub\\(/{/,\"{\"\\); m=gsub\\(/}/,\"}\"\\); print \"open=\"n\" close=\"m}')"
+    ]
+  }
+}
